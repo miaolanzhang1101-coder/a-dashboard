@@ -1,10 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { Drawer } from "./Drawer";
 import { Delta } from "./ui";
-import { Spark } from "./Spark";
 import { money, int, shortDate, nightsLabel } from "@/lib/format";
 import type { RecentBooking } from "@/lib/queries";
 import type { Mode, OperationalAlert, Investigation } from "@/lib/opportunity";
@@ -64,22 +62,15 @@ export function CommandCenter({ data }: { data: CommandData }) {
             </p>
 
             {/* primary action, directly under the revenue line */}
-            <Link
+            <a
               href={data.leakageHref}
               className="mt-3.5 inline-flex flex-col rounded-lg bg-accent px-4 py-2.5 text-white shadow-ambient transition-all duration-200 hover:-translate-y-px hover:bg-accent-hover hover:shadow-ambient-md active:translate-y-0"
             >
               <span className="flex items-center gap-1.5 text-sm font-semibold">View bookings <span aria-hidden>→</span></span>
               <span className="tnum text-xs text-white/85">See where {data.opportunityAmount} is recoverable</span>
-            </Link>
+            </a>
           </div>
 
-          {/* revenue trend */}
-          <div className="shrink-0">
-            <div className="h-14 w-52 max-w-full">
-              <Spark data={data.spark} stroke="#1F8A82" width={208} height={56} />
-            </div>
-            <p className="mt-1 text-right text-xs text-ink-3">revenue trend</p>
-          </div>
         </div>
 
         {/* inline attention (maintenance) */}

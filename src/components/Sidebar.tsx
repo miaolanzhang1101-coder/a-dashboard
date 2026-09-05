@@ -103,7 +103,7 @@ export function Sidebar({ period, onCollapse, className = "" }: { period: Period
           <li>
             <div className={`flex items-center rounded-lg pr-1 transition-all duration-150 ${onSource ? "bg-canvas shadow-ambient ring-1 ring-hairline" : "hover:bg-canvas/70"}`}>
               <Link
-                href={`/source${q}#attribution`}
+                href={`/source${q}`}
                 aria-current={onSource ? "page" : undefined}
                 onClick={(e) => {
                   if (onSource) {

@@ -60,7 +60,7 @@ export default async function OverviewPage({ searchParams }: { searchParams: Ove
     ],
     synthesis: `${int(cur.bookings)} direct stays this period, ${pct(directShare)} of all your bookings.`,
     opportunityAmount: money(leakage.totalAtStake),
-    leakageHref: `${src}#revenue`,
+    leakageHref: src,
     mode,
     alerts,
     investigation,
