@@ -105,17 +105,6 @@ export function Sidebar({ period, onCollapse, className = "" }: { period: Period
               <Link
                 href={`/source${q}`}
                 aria-current={onSource ? "page" : undefined}
-                onClick={(e) => {
-                  if (onSource) {
-                    const el = document.getElementById("attribution");
-                    if (el) {
-                      e.preventDefault();
-                      el.scrollIntoView({ behavior: "smooth", block: "start" });
-                      window.history.replaceState(null, "", `/source${q}#attribution`);
-                      setVisible("attribution");
-                    }
-                  }
-                }}
                 className={`group flex min-w-0 flex-1 items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors duration-150 ${onSource ? "font-medium text-ink" : "text-ink-2 hover:text-ink"}`}
               >
                 <svg className={`size-4 shrink-0 ${onSource ? "text-accent" : "text-ink-3 group-hover:text-ink-2"}`} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">{ICONS.bookings}</svg>

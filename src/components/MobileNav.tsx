@@ -7,7 +7,7 @@ export function MobileNav({ period, active }: { period: Period; active: "overvie
   const q = `?period=${period.key}`;
   const items: { label: string; href: string; on: boolean }[] = [
     { label: "Overview", href: `/${q}`, on: active === "overview" },
-    { label: "Bookings", href: `/source${q}#attribution`, on: active === "source" },
+    { label: "Bookings", href: `/source${q}`, on: active === "source" },
     { label: "Attribution", href: `/source${q}#attribution`, on: false },
     { label: "Revenue", href: `/source${q}#revenue`, on: false },
   ];
