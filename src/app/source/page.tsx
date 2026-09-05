@@ -30,9 +30,9 @@ export default async function SourcePage({ searchParams }: { searchParams: Sourc
   const p = buildPeriod(parsePeriodKey(searchParams.period), asOf);
   const ledgerLimit = searchParams.rows === "all" ? 5000 : 30;
 
-  const [cur, ledger, markets, mix, channels, campaignsInPeriod, allCampaigns, funnel, trend, prevTrend] = await Promise.all([
+  const [cur, ledger, markets, mix, channels, campaignsInPeriod, funnel, trend, prevTrend] = await Promise.all([
     getResults(p.start, p.end), getLedger(p.start, p.end, ledgerLimit), getMarkets(p), getMarketMix(p.start, p.end),
-    getChannels(p), getCampaigns(p, true), getCampaigns(p, false), getFunnel(p.start, p.end),
+    getChannels(p), getCampaigns(p, true), getFunnel(p.start, p.end),
     getTrend(p.start, p.end), getTrend(p.prevStart, p.prevEnd),
   ]);
   const recs = await buildRecommendations(p, campaignsInPeriod, markets, cur);
@@ -112,12 +112,6 @@ export default async function SourcePage({ searchParams }: { searchParams: Sourc
           </summary>
           <div className="border-t border-hairline px-5 pb-5 pt-4">
             <CampaignsTable rows={campaignsInPeriod} full />
-            {allCampaigns.length > campaignsInPeriod.length && (
-              <details className="mt-4">
-                <summary className="cursor-pointer text-sm text-ink-2 underline-offset-2 transition-colors duration-150 hover:text-ink hover:underline">Show all {allCampaigns.length} campaigns</summary>
-                <div className="mt-3"><CampaignsTable rows={allCampaigns.filter((c) => !campaignsInPeriod.some((x) => x.id === c.id))} full /></div>
-              </details>
-            )}
           </div>
         </details>
 

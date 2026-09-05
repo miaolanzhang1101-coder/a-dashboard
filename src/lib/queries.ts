@@ -366,15 +366,34 @@ export async function getMarketBookingsBetween(start: string, end: string, marke
 /** Lifetime totals for campaigns that *started* inside a window — used to size a re-run. */
 export async function getCampaignsStartedBetween(from: string, to: string): Promise<CampaignRow[]> {
   const rows = await sql<any[]>`
-    SELECT c.id, c.name, ch.name AS channel, c.objective, c.start_date::text AS start_date, c.end_date::text AS end_date,
-           c.total_budget::float AS budget,
-           coalesce(sum(m.spend),0)::float AS spend, coalesce(sum(m.impressions),0)::int AS impressions,
-           coalesce(sum(m.clicks),0)::int AS clicks, coalesce(sum(m.sessions),0)::int AS sessions,
-           coalesce(sum(m.bookings),0)::int AS bookings, coalesce(sum(m.revenue),0)::float AS revenue
-    FROM campaigns c JOIN channels ch ON ch.id = c.channel_id
-    LEFT JOIN daily_campaign_metrics m ON m.campaign_id = c.id
+    SELECT
+      c.id,
+      c.name,
+      ch.name AS channel,
+      c.objective,
+      c.start_date::text AS start_date,
+      c.end_date::text AS end_date,
+      c.total_budget::float AS budget,
+      COALESCE(m.spend, 0)::float AS spend,
+      COALESCE(m.impressions, 0)::int AS impressions,
+      COALESCE(m.clicks, 0)::int AS clicks,
+      COALESCE(m.sessions, 0)::int AS sessions,
+      COALESCE(m.bookings, 0)::int AS bookings,
+      COALESCE(m.revenue, 0)::float AS revenue
+    FROM campaigns c
+    JOIN channels ch ON ch.id = c.channel_id
+    LEFT JOIN LATERAL (
+      SELECT
+        SUM(spend) AS spend,
+        SUM(impressions) AS impressions,
+        SUM(clicks) AS clicks,
+        SUM(sessions) AS sessions,
+        SUM(bookings) AS bookings,
+        SUM(revenue) AS revenue
+      FROM daily_campaign_metrics
+      WHERE campaign_id = c.id
+    ) m ON true
     WHERE c.start_date BETWEEN ${from} AND ${to}
-    GROUP BY c.id, c.name, ch.name, c.objective, c.start_date, c.end_date, c.total_budget
   `;
   return rows.map((r) => ({
     id: r.id, name: r.name, channel: r.channel, objective: r.objective, startDate: r.start_date, endDate: r.end_date,

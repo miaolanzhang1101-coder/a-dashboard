@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useState } from "react";
 import { Drawer } from "./Drawer";
 import { Delta } from "./ui";
@@ -62,13 +64,14 @@ export function CommandCenter({ data }: { data: CommandData }) {
             </p>
 
             {/* primary action, directly under the revenue line */}
-            <a
+            <Link
               href={data.leakageHref}
+              prefetch
               className="mt-3.5 inline-flex flex-col rounded-lg bg-accent px-4 py-2.5 text-white shadow-ambient transition-all duration-200 hover:-translate-y-px hover:bg-accent-hover hover:shadow-ambient-md active:translate-y-0"
             >
               <span className="flex items-center gap-1.5 text-sm font-semibold">View bookings <span aria-hidden>→</span></span>
               <span className="tnum text-xs text-white/85">See where {data.opportunityAmount} is recoverable</span>
-            </a>
+            </Link>
           </div>
 
         </div>

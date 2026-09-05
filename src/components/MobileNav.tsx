@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 
 import type { Period } from "@/lib/period";
 
@@ -17,9 +18,9 @@ export function MobileNav({ period, active }: { period: Period; active: "overvie
         <span className="grid h-6 w-6 shrink-0 place-items-center rounded bg-ink text-[12px] font-semibold text-white">A</span>
         <nav className="flex items-center gap-1 overflow-x-auto text-[13px]">
           {items.map((i) => (
-            <a key={i.label} href={i.href} className={`whitespace-nowrap rounded-md px-2.5 py-1.5 transition-colors duration-150 ${i.on ? "bg-canvas font-medium text-ink" : "text-ink-2 hover:text-ink"}`}>
+            <Link key={i.label} href={i.href} prefetch className={`whitespace-nowrap rounded-md px-2.5 py-1.5 transition-colors duration-150 ${i.on ? "bg-canvas font-medium text-ink" : "text-ink-2 hover:text-ink"}`}>
               {i.label}
-            </a>
+            </Link>
           ))}
         </nav>
       </div>
