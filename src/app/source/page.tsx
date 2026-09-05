@@ -11,13 +11,25 @@ import { buildRecommendations } from "@/lib/narrative";
 import { buildLeakage } from "@/lib/leakage";
 import { int, money } from "@/lib/format";
 import { OTA_COMMISSION_RATE } from "@/lib/config";
-import { getAsOf, getCampaigns, getChannels, getFunnel, getLedger, getMarketMix, getMarkets, getResults, getTrend } from "@/lib/queries";
+import { getAsOf, getCampaigns, getCampaignsStartedBetween, getChannels, getFunnel, getLedger, getMarketBookingsBetween, getMarketMix, getMarkets, getResults, getTrend } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
 interface SourceSearchParams {
   period?: string;
   rows?: string;
+}
+
+function shiftDays(iso: string, days: number) {
+  const d = new Date(iso + "T00:00:00Z");
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+function shiftYear(iso: string, years: number) {
+  const d = new Date(iso + "T00:00:00Z");
+  d.setUTCFullYear(d.getUTCFullYear() + years);
+  return d.toISOString().slice(0, 10);
 }
 
 /**
@@ -30,12 +42,21 @@ export default async function SourcePage({ searchParams }: { searchParams: Sourc
   const p = buildPeriod(parsePeriodKey(searchParams.period), asOf);
   const ledgerLimit = searchParams.rows === "all" ? 5000 : 30;
 
-  const [cur, ledger, markets, mix, channels, campaignsInPeriod, funnel, trend, prevTrend] = await Promise.all([
+  const [cur, ledger, markets, mix, channels, campaignsInPeriod, funnel, trend, prevTrend, lastYearCampaigns, winterMarketBookings] = await Promise.all([
     getResults(p.start, p.end), getLedger(p.start, p.end, ledgerLimit), getMarkets(p), getMarketMix(p.start, p.end),
     getChannels(p), getCampaigns(p, true), getFunnel(p.start, p.end),
     getTrend(p.start, p.end), getTrend(p.prevStart, p.prevEnd),
+    getCampaignsStartedBetween(
+      shiftYear(shiftDays(p.end, 1), -1),
+      shiftYear(shiftDays(p.end, 75), -1)
+    ).catch(() => []),
+    getMarketBookingsBetween(
+      shiftYear(p.end, -1).slice(0, 4) + "-11-01",
+      shiftYear(p.end, -1).slice(0, 4) + "-12-31",
+      ["Seattle", "Chicago", "New York", "Vancouver"]
+    ).catch(() => ({ bookings: 0, revenue: 0 })),
   ]);
-  const recs = await buildRecommendations(p, campaignsInPeriod, markets, cur);
+  const recs = await buildRecommendations(p, campaignsInPeriod, markets, cur, lastYearCampaigns, winterMarketBookings);
   const decisions = readDecisions();
   const leakage = buildLeakage(cur, campaignsInPeriod, mix);
   const otaPct = Math.round(OTA_COMMISSION_RATE * 100);

@@ -88,7 +88,14 @@ export interface Recommendation {
  * Replace with a `recommendations` table when Autumn's planning team
  * starts authoring these by hand.
  */
-export async function buildRecommendations(p: Period, campaigns: CampaignRow[], markets: MarketRow[], cur: Results): Promise<Recommendation[]> {
+export async function buildRecommendations(
+  p: Period,
+  campaigns: CampaignRow[],
+  markets: MarketRow[],
+  cur: Results,
+  preloadedLastYearCampaigns?: CampaignRow[],
+  preloadedWinterMarketBookings?: { bookings: number; revenue: number },
+): Promise<Recommendation[]> {
   const recs: Recommendation[] = [];
 
   // 1a. A campaign that is still running and clearly paying for itself: extend it.
@@ -110,7 +117,7 @@ export async function buildRecommendations(p: Period, campaigns: CampaignRow[], 
     // 1b. Otherwise, bring back last year's next-season flight that earned the most per dollar.
     const from = shiftYear(shiftDays(p.end, 1), -1);
     const to = shiftYear(shiftDays(p.end, 75), -1);
-    const lastYear = (await getCampaignsStartedBetween(from, to).catch(() => []))
+    const lastYear = (preloadedLastYearCampaigns ?? (await getCampaignsStartedBetween(from, to).catch(() => [])))
       .filter((c) => c.objective === "bookings" && c.spend > 500 && (c.roas ?? 0) >= 2)
       .sort((a, b) => (b.roas ?? 0) - (a.roas ?? 0))[0];
     if (lastYear) {
@@ -128,8 +135,11 @@ export async function buildRecommendations(p: Period, campaigns: CampaignRow[], 
 
   // 2. Winter sun-seekers: markets that over-index Nov–Feb.
   const winterMarkets = ["Seattle", "Chicago", "New York", "Vancouver"];
-  const lastWinter = await getMarketBookingsBetween(shiftYear(p.end, -1).slice(0, 4) + "-11-01", shiftYear(p.end, -1).slice(0, 4) + "-12-31", winterMarkets)
-    .catch(() => ({ bookings: 0, revenue: 0 }));
+  const lastWinter = preloadedWinterMarketBookings ?? await getMarketBookingsBetween(
+    shiftYear(p.end, -1).slice(0, 4) + "-11-01",
+    shiftYear(p.end, -1).slice(0, 4) + "-12-31",
+    winterMarkets
+  ).catch(() => ({ bookings: 0, revenue: 0 }));
   if (lastWinter.bookings > 0) {
     recs.push({
       id: "winter-sun",
