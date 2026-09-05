@@ -1,4 +1,4 @@
-import { money, pct } from "@/lib/format";
+import { int, money, pct } from "@/lib/format";
 
 function Legend({ color, label, value }: { color: string; label: string; value: string }) {
   return (
@@ -127,6 +127,40 @@ export function LeakageBars({ items }: { items: LeakBar[] }) {
               <div className="h-2.5 rounded-full bg-viz-coral" style={{ width: `${Math.max(3, (i.amount / max) * 100)}%` }} />
             </div>
             <span className="tnum w-20 text-right font-semibold text-down-ink">{money(i.amount)}</span>
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+export interface ChannelBar {
+  label: string;
+  revenue: number;
+  bookings: number;
+  isPaid: boolean;
+}
+
+/** Direct booking revenue by channel — a compact ranked bar list. */
+export function ChannelBars({ rows }: { rows: ChannelBar[] }) {
+  if (rows.length === 0) return <p className="text-sm text-ink-2">No direct channels this period.</p>;
+  const max = Math.max(...rows.map((r) => r.revenue), 1);
+  return (
+    <ul className="space-y-3">
+      {rows.map((r) => (
+        <li key={r.label}>
+          <div className="flex items-center justify-between gap-2 text-sm">
+            <span className="min-w-0 truncate text-ink">
+              {r.label}
+              {r.isPaid && <span className="ml-1.5 rounded bg-canvas px-1 py-px text-xs text-ink-3">paid</span>}
+            </span>
+            <span className="tnum shrink-0 font-medium text-ink">{money(r.revenue)}</span>
+          </div>
+          <div className="mt-1.5 flex items-center gap-3">
+            <div className="h-2.5 flex-1 rounded-full bg-canvas">
+              <div className="h-2.5 rounded-full bg-accent" style={{ width: `${Math.max(2, (r.revenue / max) * 100)}%` }} />
+            </div>
+            <span className="tnum w-16 text-right text-xs text-ink-3">{int(r.bookings)} stays</span>
           </div>
         </li>
       ))}

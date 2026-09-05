@@ -60,13 +60,13 @@ export default async function OverviewPage({ searchParams }: { searchParams: Ove
     ],
     synthesis: `${int(cur.bookings)} direct stays this period, ${pct(directShare)} of all your bookings.`,
     opportunityAmount: money(leakage.totalAtStake),
-    leakageHref: `${src}#bookings`,
+    leakageHref: `${src}#revenue`,
     mode,
     alerts,
     investigation,
     ledger: topStays,
     ledgerTotal: cur.bookings,
-    ledgerHref: `${src}#bookings`,
+    ledgerHref: `${src}#attribution`,
   };
 
   const adMetrics: { label: string; help: string; value: string; sub?: string }[] = [
@@ -104,7 +104,7 @@ export default async function OverviewPage({ searchParams }: { searchParams: Ove
             <TrendChart current={trend} previous={prevTrend} compareLabel={p.compareLabel} />
           </Panel>
           <Panel>
-            <PanelHeader title="Feeder markets" help="The cities your direct bookers come from." aside={<Link href={`${src}#bookings`} className="text-sm text-ink-2 transition-colors duration-150 hover:text-ink">All</Link>} />
+            <PanelHeader title="Feeder markets" help="The cities your direct bookers come from." aside={<Link href={`${src}#revenue`} className="text-sm text-ink-2 transition-colors duration-150 hover:text-ink">All</Link>} />
             <MarketsTable rows={markets} />
           </Panel>
         </div>
@@ -136,7 +136,7 @@ export default async function OverviewPage({ searchParams }: { searchParams: Ove
           </Panel>
         </div>
         <Panel>
-          <PanelHeader title="Campaign summary" sub="by return" aside={<Link href={`${src}#marketing`} className="text-sm text-ink-2 transition-colors duration-150 hover:text-ink">All</Link>} />
+          <PanelHeader title="Campaign summary" sub="by return" aside={<Link href={`${src}#attribution`} className="text-sm text-ink-2 transition-colors duration-150 hover:text-ink">All</Link>} />
           <CampaignsTable rows={campaigns} />
         </Panel>
 

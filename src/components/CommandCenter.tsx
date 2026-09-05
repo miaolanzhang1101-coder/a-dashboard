@@ -62,19 +62,24 @@ export function CommandCenter({ data }: { data: CommandData }) {
             <p className="mt-2 text-sm text-ink-2">
               Direct room revenue <span className="text-ink-3">vs {data.compareLabel}</span>
             </p>
-            <div className="mt-3 h-9 w-40 max-w-full">
-              <Spark data={data.spark} stroke="#1F8A82" width={160} height={36} />
-            </div>
+
+            {/* primary action, directly under the revenue line */}
+            <Link
+              href={data.leakageHref}
+              className="mt-3.5 inline-flex flex-col rounded-lg bg-accent px-4 py-2.5 text-white shadow-ambient transition-all duration-200 hover:-translate-y-px hover:bg-accent-hover hover:shadow-ambient-md active:translate-y-0"
+            >
+              <span className="flex items-center gap-1.5 text-sm font-semibold">View bookings <span aria-hidden>→</span></span>
+              <span className="tnum text-xs text-white/85">See where {data.opportunityAmount} is recoverable</span>
+            </Link>
           </div>
 
-          {/* primary action: view the bookings screen */}
-          <Link
-            href={data.leakageHref}
-            className="flex shrink-0 flex-col justify-center rounded-lg bg-accent-soft px-4 py-3 text-accent-ink shadow-ambient ring-1 ring-accent/30 transition-all duration-200 hover:-translate-y-px hover:shadow-ambient-md active:translate-y-0 lg:max-w-xs"
-          >
-            <span className="flex items-center gap-1.5 text-base font-semibold">View bookings <span aria-hidden>→</span></span>
-            <span className="tnum mt-0.5 text-xs text-accent-ink/90">See where {data.opportunityAmount} is recoverable</span>
-          </Link>
+          {/* revenue trend */}
+          <div className="shrink-0">
+            <div className="h-14 w-52 max-w-full">
+              <Spark data={data.spark} stroke="#1F8A82" width={208} height={56} />
+            </div>
+            <p className="mt-1 text-right text-xs text-ink-3">revenue trend</p>
+          </div>
         </div>
 
         {/* inline attention (maintenance) */}

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, type ReactNode } from "react";
 import { Sidebar } from "./Sidebar";
 import { MobileNav } from "./MobileNav";
+import { HashScroll } from "./HashScroll";
 import type { Period, PeriodKey } from "@/lib/period";
 import { dateRange } from "@/lib/format";
 
@@ -27,6 +28,7 @@ export function AppShell({
 
   return (
     <div className={`min-h-screen bg-canvas transition-all duration-200 lg:grid ${collapsed ? "lg:grid-cols-1" : "lg:grid-cols-[15rem_1fr]"}`}>
+      <HashScroll />
       {!collapsed && <Sidebar period={period.key} onCollapse={() => setCollapsed(true)} className="sticky top-0 hidden h-screen lg:flex" />}
       <MobileNav period={period} active={active} />
 

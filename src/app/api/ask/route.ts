@@ -71,10 +71,10 @@ export async function POST(req: Request) {
 
 function destinationFor(q: string, period: string): { href: string; label: string } {
   const base = `/source?period=${period}`;
-  if (/ota|leak|commission|losing|book\s*direct/.test(q)) return { href: `${base}#bookings`, label: "View leaks" };
-  if (/campaign|roas|return|spend|marketing|\bads?\b|drove|driving/.test(q)) return { href: `${base}#marketing`, label: "View marketing" };
-  if (/trend|increas|grow|month|year|over time/.test(q)) return { href: `${base}#insights`, label: "View trends" };
-  return { href: `${base}#bookings`, label: "View bookings" };
+  if (/ota|leak|commission|losing|book\s*direct/.test(q)) return { href: `${base}#revenue`, label: "View revenue" };
+  if (/campaign|roas|return|spend|marketing|\bads?\b|drove|driving/.test(q)) return { href: `${base}#attribution`, label: "View attribution" };
+  if (/trend|increas|grow|month|year|over time/.test(q)) return { href: `${base}#revenue`, label: "View trends" };
+  return { href: `${base}#revenue`, label: "View revenue" };
 }
 
 interface DataCtx {

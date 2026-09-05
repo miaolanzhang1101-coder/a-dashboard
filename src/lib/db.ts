@@ -13,7 +13,6 @@ if (!url) throw new Error("DATABASE_URL is not set. Copy .env.example to .env an
 export const sql =
   globalThis.__autumnSql ??
   postgres(url, {
-    prepare: false,
     ssl: url.includes("localhost") || url.includes("127.0.0.1") ? false : "require",
     max: 5,
     idle_timeout: 20,

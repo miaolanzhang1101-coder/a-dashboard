@@ -8,9 +8,9 @@ export function MobileNav({ period, active }: { period: Period; active: "overvie
   const q = `?period=${period.key}`;
   const items: { label: string; href: string; on: boolean }[] = [
     { label: "Overview", href: `/${q}`, on: active === "overview" },
-    { label: "Bookings", href: `/source${q}#bookings`, on: false },
-    { label: "Marketing", href: `/source${q}#marketing`, on: false },
-    { label: "Insights", href: `/source${q}#insights`, on: false },
+    { label: "Bookings", href: `/source${q}#attribution`, on: active === "source" },
+    { label: "Attribution", href: `/source${q}#attribution`, on: false },
+    { label: "Revenue", href: `/source${q}#revenue`, on: false },
   ];
   return (
     <div className="sticky top-0 z-20 border-b border-line bg-surface lg:hidden">
