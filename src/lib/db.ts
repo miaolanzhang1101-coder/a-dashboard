@@ -16,6 +16,7 @@ export const sql =
     ssl: url.includes("localhost") || url.includes("127.0.0.1") ? false : "require",
     max: 5,
     idle_timeout: 20,
+    prepare: false,
     types: {
       date: { to: 1082, from: [1082], serialize: (v: string) => v, parse: (v: string) => v },
       numeric: { to: 1700, from: [1700], serialize: (v: number) => String(v), parse: (v: string) => Number(v) },
