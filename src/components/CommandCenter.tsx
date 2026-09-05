@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 
+import { useEffect } from "react";
+
 import { useState } from "react";
 import { Drawer } from "./Drawer";
 import { Delta } from "./ui";
@@ -40,6 +42,10 @@ export interface CommandData {
  */
 export function CommandCenter({ data }: { data: CommandData }) {
   const [drawer, setDrawer] = useState<null | "ledger">(null);
+
+  useEffect(() => {
+    fetch(data.leakageHref, { headers: { RSC: "1" } }).catch(() => {});
+  }, [data.leakageHref]);
   const toneClass = (t?: "up" | "down") => (t === "up" ? "text-up-ink" : t === "down" ? "text-down-ink" : "text-ink");
 
   return (
