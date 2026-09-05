@@ -175,9 +175,19 @@ export async function getRecentBookings(start: string, end: string, limit = 5): 
 
 export async function getLedger(start: string, end: string, limit = 60, offset = 0) {
   const rows = await sql<any[]>`
-    SELECT b.id, b.booking_date::text AS booked_on, b.checkin_date::text AS check_in, b.checkout_date::text AS check_out,
-           b.nights, b.guests, b.room_revenue::float AS revenue,
-           mk.name AS market, mk.region, ch.name AS channel, c.name AS campaign
+    SELECT
+      b.id,
+      b.booking_date::text AS booked_on,
+      b.checkin_date::text AS check_in,
+      b.checkout_date::text AS check_out,
+      b.nights,
+      b.guests,
+      b.room_revenue::float AS revenue,
+      mk.name AS market,
+      mk.region,
+      ch.name AS channel,
+      c.name AS campaign,
+      count(*) OVER()::int AS total_count
     FROM bookings b
     JOIN channels ch ON ch.id = b.channel_id
     JOIN markets mk ON mk.id = b.market_id
@@ -186,10 +196,9 @@ export async function getLedger(start: string, end: string, limit = 60, offset =
     ORDER BY b.booking_date DESC, b.id DESC
     LIMIT ${limit} OFFSET ${offset}
   `;
-  const [{ total }] = await sql<{ total: number }[]>`
-    SELECT count(*)::int AS total FROM bookings b JOIN channels ch ON ch.id = b.channel_id
-    WHERE b.booking_date BETWEEN ${start} AND ${end} AND ${DIRECT}
-  `;
+
+  const total = rows.length > 0 ? rows[0].total_count : 0;
+
   return { rows: rows.map(mapBooking), total };
 }
 
@@ -294,17 +303,37 @@ export async function getChannels(p: Period): Promise<ChannelRow[]> {
 
 export async function getCampaigns(p: Period, onlyInPeriod = true): Promise<CampaignRow[]> {
   const rows = await sql<any[]>`
-    SELECT c.id, c.name, ch.name AS channel, c.objective, c.start_date::text AS start_date, c.end_date::text AS end_date,
-           c.total_budget::float AS budget,
-           coalesce(sum(m.spend),0)::float AS spend, coalesce(sum(m.impressions),0)::int AS impressions,
-           coalesce(sum(m.clicks),0)::int AS clicks, coalesce(sum(m.sessions),0)::int AS sessions,
-           coalesce(sum(m.bookings),0)::int AS bookings, coalesce(sum(m.revenue),0)::float AS revenue
+    SELECT
+      c.id,
+      c.name,
+      ch.name AS channel,
+      c.objective,
+      c.start_date::text AS start_date,
+      c.end_date::text AS end_date,
+      c.total_budget::float AS budget,
+      COALESCE(m.spend, 0)::float AS spend,
+      COALESCE(m.impressions, 0)::int AS impressions,
+      COALESCE(m.clicks, 0)::int AS clicks,
+      COALESCE(m.sessions, 0)::int AS sessions,
+      COALESCE(m.bookings, 0)::int AS bookings,
+      COALESCE(m.revenue, 0)::float AS revenue
     FROM campaigns c
     JOIN channels ch ON ch.id = c.channel_id
-    LEFT JOIN daily_campaign_metrics m ON m.campaign_id = c.id AND m.date BETWEEN ${p.start} AND ${p.end}
+    LEFT JOIN (
+      SELECT
+        campaign_id,
+        SUM(spend) AS spend,
+        SUM(impressions) AS impressions,
+        SUM(clicks) AS clicks,
+        SUM(sessions) AS sessions,
+        SUM(bookings) AS bookings,
+        SUM(revenue) AS revenue
+      FROM daily_campaign_metrics
+      WHERE date BETWEEN ${p.start} AND ${p.end}
+      GROUP BY campaign_id
+    ) m ON m.campaign_id = c.id
     WHERE ${onlyInPeriod ? sql`c.start_date <= ${p.end} AND c.end_date >= ${p.start}` : sql`true`}
-    GROUP BY c.id, c.name, ch.name, c.objective, c.start_date, c.end_date, c.total_budget
-    ORDER BY coalesce(sum(m.revenue),0) DESC, c.start_date DESC
+    ORDER BY COALESCE(m.revenue, 0) DESC, c.start_date DESC
   `;
   return rows.map((r) => ({
     id: r.id,
