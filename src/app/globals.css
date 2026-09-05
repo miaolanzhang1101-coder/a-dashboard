@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html { background: #F3F5F7; }
+body {
+  color: #0F2438;
+  font-feature-settings: "cv11", "ss01", "tnum";
+  -webkit-font-smoothing: antialiased;
+}
+
+.tnum { font-variant-numeric: tabular-nums; }
+
+:focus-visible {
+  outline: 2px solid #1F8A82;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* Native disclosure: hide the default marker, animate the chevron */
+details > summary { list-style: none; cursor: pointer; }
+details > summary::-webkit-details-marker { display: none; }
+details[open] .chev { transform: rotate(180deg); }
+.chev { transition: transform 160ms ease; }
+
+/* Data tables share one rhythm */
+.data-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13.5px; }
+.data-table th {
+  text-align: left; font-weight: 500; color: #7A8A9B; font-size: 12px;
+  padding: 0 12px 10px 0; border-bottom: 1px solid rgba(15,36,56,0.08); white-space: nowrap;
+}
+.data-table td { padding: 11px 12px 11px 0; border-bottom: 1px solid rgba(15,36,56,0.05); vertical-align: middle; }
+.data-table tr:last-child td { border-bottom: 0; }
+.data-table th.num, .data-table td.num { text-align: right; padding-right: 0; padding-left: 12px; font-variant-numeric: tabular-nums; }
+.data-table tfoot td { border-top: 1px solid #DCE3EA; border-bottom: 0; font-weight: 500; color: #0F2438; }
